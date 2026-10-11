@@ -1,0 +1,10 @@
+{
+  "description": "Engage with a premium personal AI companion featuring a dynamic animated character that converses, reasons, uses tools, and retains memory for seamless interaction.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
