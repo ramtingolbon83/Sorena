@@ -16,6 +16,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from agent.agent import Agent
+from agent.persona import SYSTEM_PROMPT
 from tools.registry import tool_registry
 from tools.schemas import tools as tool_schemas
 
@@ -113,7 +114,9 @@ async def chat(req: ChatRequest):
         raise HTTPException(status_code=400, detail="Empty message")
 
     session_id = req.session_id or uuid.uuid4().hex
-    history = sessions.setdefault(session_id, [])
+    history = sessions.setdefault(
+        session_id, [{"role": "system", "content": SYSTEM_PROMPT}]
+    )
     start = len(history)  # rollback point if the agent fails
     history.append({"role": "user", "content": text})
 
