@@ -8,9 +8,13 @@ Run:  uvicorn server:app --reload --port 8000
 """
 
 import asyncio
+import base64
+import io
 import uuid
+import wave
+from functools import lru_cache
 
-from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, HTTPException, Request, WebSocket, WebSocketDisconnect
 from fastapi.concurrency import run_in_threadpool
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -19,6 +23,8 @@ from agent.agent import Agent
 from agent.persona import SYSTEM_PROMPT
 from tools.registry import tool_registry
 from tools.schemas import tools as tool_schemas
+from voice.stt import Listener
+from voice.tts import Speaker
 
 
 class Hub:
@@ -54,6 +60,24 @@ agent = Agent()
 sessions: dict[str, list[dict]] = {}
 background: set[asyncio.Task] = set()
 
+
+@lru_cache(maxsize=1)
+def get_listener() -> Listener:
+    """Whisper is loaded on the first voice request (~1 GB VRAM), not at server start."""
+    return Listener()
+
+
+@lru_cache(maxsize=1)
+def get_speaker() -> Speaker:
+    """The Piper voice is loaded on the first spoken reply."""
+    return Speaker()
+
+
+def wav_seconds(wav: bytes) -> float:
+    with wave.open(io.BytesIO(wav), "rb") as clip:
+        return clip.getnframes() / clip.getframerate()
+
+
 app = FastAPI(title="YALDA agent service")
 app.add_middleware(
     CORSMiddleware,
@@ -66,6 +90,8 @@ app.add_middleware(
 class ChatRequest(BaseModel):
     message: str
     session_id: str | None = None
+    voice: bool = False  # the text came from the microphone
+    speak: bool = False
 
 
 @app.get("/api/health")
@@ -88,6 +114,41 @@ def list_tools():
             }
         )
     return items
+
+
+@app.post(
+    "/api/stt",
+    responses={
+        400: {"description": "Empty audio"},
+        502: {"description": "Transcription failed"},
+    },
+)
+async def speech_to_text(request: Request):
+    """Raw audio in the request body (webm/ogg/wav...) -> {"text": ...} via Whisper."""
+    data = await request.body()
+    if not data:
+        raise HTTPException(status_code=400, detail="Empty audio")
+
+    hub.gen += (
+        1  # cancels a pending speaking -> success transition from the previous reply
+    )
+    await hub.set_state("working", message="transcribing")
+    try:
+        text = await run_in_threadpool(get_listener().transcribe, io.BytesIO(data))
+    except Exception as exc:
+        await hub.set_state("error", message=str(exc))
+        raise HTTPException(
+            status_code=502, detail=f"Transcription failed: {exc}"
+        ) from exc
+    return {"text": text}
+
+
+@app.post("/api/listening")
+async def listening():
+    """The HUD started recording: cancel pending transitions and show the listening state."""
+    hub.gen += 1
+    await hub.set_state("listening")
+    return {"ok": True}
 
 
 async def _finish(gen: int, speaking_seconds: float):
@@ -135,8 +196,9 @@ async def chat(req: ChatRequest):
             )
         asyncio.run_coroutine_threadsafe(hub.broadcast(payload), loop)
 
-    await hub.set_state("listening")
-    await asyncio.sleep(0.6)  # let the pink "listening" state be seen
+    if not req.voice:  # a voice message already showed "listening" while recording
+        await hub.set_state("listening")
+    await asyncio.sleep(0.6)
     await hub.set_state("working")
 
     try:
@@ -150,12 +212,29 @@ async def chat(req: ChatRequest):
     reply = message.get("content") or ""
     history.append(message)
 
+    audio = None
+    speaking_seconds = max(1.5, min(8.0, len(reply) / 14))
+    if req.speak and reply:
+        try:
+            wav = await run_in_threadpool(get_speaker().synthesize, reply)
+            audio = base64.b64encode(wav).decode("ascii")
+            speaking_seconds = (
+                wav_seconds(wav) + 0.4
+            )  # the browser starts playback slightly later
+        except Exception:  # noqa: BLE001 - a TTS failure must not lose the text reply
+            audio = None
+
     await hub.set_state("speaking")
-    task = asyncio.create_task(_finish(gen, max(1.5, min(8.0, len(reply) / 14))))
+    task = asyncio.create_task(_finish(gen, speaking_seconds))
     background.add(task)
     task.add_done_callback(background.discard)
 
-    return {"session_id": session_id, "reply": reply, "tool_calls": tool_calls}
+    return {
+        "session_id": session_id,
+        "reply": reply,
+        "tool_calls": tool_calls,
+        "audio": audio,  # base64 WAV, or None
+    }
 
 
 @app.websocket("/ws")
