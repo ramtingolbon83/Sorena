@@ -10,6 +10,11 @@ class Listener:
     def __init__(self):
         self.model = WhisperModel(MODEL_SIZE, device="cuda", compute_type="int8_float16")
 
+    def transcribe(self, audio):
+        """audio: a 16 kHz float32 numpy waveform, or a file path / file-like object (webm, ogg, wav...)."""
+        segments, _ = self.model.transcribe(audio, language="fa", vad_filter=True)
+        return " ".join(s.text for s in segments).strip()
+
     def listen(self):
         chunks = []
 
@@ -21,6 +26,4 @@ class Listener:
 
         if not chunks:
             return ""
-        audio = np.concatenate(chunks).flatten()
-        segments, _ = self.model.transcribe(audio, language="fa", vad_filter=True)
-        return " ".join(s.text for s in segments).strip()
+        return self.transcribe(np.concatenate(chunks).flatten())
