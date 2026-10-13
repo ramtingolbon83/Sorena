@@ -23,3 +23,9 @@
 .chat-panel input { flex: 1; min-width: 0; padding: 10px 12px; color: #fff; background: transparent; border: 0; outline: 0; font: inherit; font-size: 15px; }
 .chat-panel form button { padding: 0 16px; color: var(--glow); background: transparent; border: 0; border-inline-start: 1px solid color-mix(in srgb, var(--accent) 25%, transparent); font-size: 12px; font-weight: 600; letter-spacing: .16em; cursor: pointer; }
 .chat-panel form button:disabled { opacity: .4; cursor: default; }
+.chat-panel form .mic { border-inline-start: 0; border-inline-end: 1px solid color-mix(in srgb, var(--accent) 25%, transparent); }
+.chat-panel form .mic.recording { color: #fff; background: color-mix(in srgb, var(--accent) 35%, transparent); animation: mic-pulse 1s ease-in-out infinite; }
+@keyframes mic-pulse { 50% { opacity: .55; } }
+.chat-log .note { color: #6c6f78; }
+.chat-panel .speak-toggle { padding: 0; color: inherit; background: transparent; border: 0; font: inherit; letter-spacing: inherit; cursor: pointer; }
+.chat-panel .speak-toggle[aria-pressed="true"] { color: var(--glow); }

@@ -1,11 +1,29 @@
 import { useCallback, useEffect, useRef, useState } from "react"
-import { fetchTools, sendChat, type ToolCall, type ToolInfo } from "./api"
+import {
+  fetchTools,
+  sendChat,
+  startListening,
+  transcribe,
+  type ToolCall,
+  type ToolInfo,
+} from "./api"
 import { useAgentSocket, type AgentEvent } from "./useAgentSocket"
+import { useRecorder } from "./useRecorder"
 import "./chat-dock.css"
 
 type Line =
-  | { kind: "user" | "agent" | "error"; text: string }
+  | { kind: "user" | "agent" | "error" | "note"; text: string }
   | { kind: "tool"; call: ToolCall }
+
+const SPEAK_KEY = "yalda.speak"
+
+const readSpeakPreference = () => {
+  try {
+    return localStorage.getItem(SPEAK_KEY) !== "off"
+  } catch {
+    return true // storage can be blocked; default to speaking
+  }
+}
 
 const formatCall = (call: ToolCall) =>
   `${call.tool}(${Object.entries(call.arguments)
@@ -19,8 +37,11 @@ export default function ChatDock({ onState }: { onState: (state: string) => void
   const [input, setInput] = useState("")
   const [busy, setBusy] = useState(false)
   const [activeTool, setActiveTool] = useState<string | null>(null)
+  const [speak, setSpeak] = useState(readSpeakPreference)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
   const sessionId = useRef<string | undefined>(undefined)
   const logRef = useRef<HTMLDivElement>(null)
+  const recorder = useRecorder()
 
   const onEvent = useCallback(
     (event: AgentEvent) => {
@@ -44,24 +65,87 @@ export default function ChatDock({ onState }: { onState: (state: string) => void
     logRef.current?.scrollTo({ top: logRef.current.scrollHeight })
   }, [lines, open])
 
+  const addLine = (line: Line) => setLines((prev) => [...prev, line])
+
+  const stopAudio = () => {
+    audioRef.current?.pause()
+    audioRef.current = null
+  }
+
+  const toggleSpeak = () => {
+    const next = !speak
+    setSpeak(next)
+    if (!next) stopAudio()
+    try {
+      localStorage.setItem(SPEAK_KEY, next ? "on" : "off")
+    } catch {
+      /* storage unavailable: the choice just won't be remembered */
+    }
+  }
+
+  const playReply = (audio: string) => {
+    stopAudio()
+    const player = new Audio(`data:audio/wav;base64,${audio}`)
+    audioRef.current = player
+    player.play().catch(() => {
+      addLine({ kind: "note", text: "The browser blocked audio. Click on the page and try again." })
+    })
+  }
+
+  /** One chat round-trip, for typed text and for transcribed speech. */
+  const ask = async (text: string, voice: boolean) => {
+    addLine({ kind: "user", text: voice ? `🎤 ${text}` : text })
+    try {
+      stopAudio()
+      const response = await sendChat(text, sessionId.current, voice, speak)
+      sessionId.current = response.session_id
+      response.tool_calls.forEach((call) => addLine({ kind: "tool", call }))
+      addLine({ kind: "agent", text: response.reply || "(no reply)" })
+      if (response.audio) playReply(response.audio)
+    } catch (error) {
+      addLine({ kind: "error", text: String(error) })
+      if (link !== "online") onState("error") // the backend could not announce it itself
+    }
+  }
+
   const submit = async (event: React.FormEvent) => {
     event.preventDefault()
     const text = input.trim()
     if (!text || busy) return
     setInput("")
     setBusy(true)
-    setLines((prev) => [...prev, { kind: "user", text }])
     try {
-      const response = await sendChat(text, sessionId.current)
-      sessionId.current = response.session_id
-      setLines((prev) => [
-        ...prev,
-        ...response.tool_calls.map((call): Line => ({ kind: "tool", call })),
-        { kind: "agent", text: response.reply || "(no reply)" },
-      ])
+      await ask(text, false)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  /** Click once to start recording (pink eye), click again to stop, transcribe and send. */
+  const toggleMic = async () => {
+    if (busy) return
+    if (!recorder.recording) {
+      try {
+        stopAudio() // talking over the reply interrupts it
+        await recorder.start()
+        startListening().catch(() => onState("listening")) // backend offline: show it locally
+      } catch (error) {
+        addLine({ kind: "error", text: `Microphone unavailable: ${String(error)}` })
+      }
+      return
+    }
+    setBusy(true)
+    try {
+      const text = await transcribe(await recorder.stop())
+      if (!text) {
+        onState("idle")
+        addLine({ kind: "note", text: "No speech detected." })
+        return
+      }
+      await ask(text, true)
     } catch (error) {
-      setLines((prev) => [...prev, { kind: "error", text: String(error) }])
-      if (link !== "online") onState("error") // the backend could not announce it itself
+      addLine({ kind: "error", text: String(error) })
+      if (link !== "online") onState("error")
     } finally {
       setBusy(false)
     }
@@ -75,6 +159,15 @@ export default function ChatDock({ onState }: { onState: (state: string) => void
             <span>
               <i className={`link link-${link}`} /> LINK // {link.toUpperCase()}
             </span>
+            <button
+              type="button"
+              className="speak-toggle"
+              onClick={toggleSpeak}
+              aria-pressed={speak}
+              title="Read replies aloud"
+            >
+              SPEAK {speak ? "ON" : "OFF"}
+            </button>
             <span>{tools.length} TOOLS</span>
           </header>
 
@@ -111,6 +204,16 @@ export default function ChatDock({ onState }: { onState: (state: string) => void
           </div>
 
           <form onSubmit={submit}>
+            <button
+              type="button"
+              className={`mic ${recorder.recording ? "recording" : ""}`}
+              onClick={toggleMic}
+              disabled={busy}
+              aria-pressed={recorder.recording}
+              title={recorder.recording ? "Stop and send" : "Speak"}
+            >
+              {recorder.recording ? "STOP" : "MIC"}
+            </button>
             <input
               value={input}
               onChange={(event) => setInput(event.target.value)}
