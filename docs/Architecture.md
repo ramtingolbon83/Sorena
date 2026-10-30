@@ -1,6 +1,6 @@
-# Yalda Architecture
+# Sorena Architecture
 
-Yalda is a local AI companion agent. It can be driven from a terminal (`main.py`, with voice in and out) or from a web HUD (React frontend + FastAPI service). Both paths share the same `Agent` loop, tool registry and local model server.
+Sorena is a local AI companion agent. It can be driven from a terminal (`main.py`, with voice in and out) or from a web HUD (React frontend + FastAPI service). Both paths share the same `Agent` loop, tool registry and local model server.
 
 > Animated edges (the moving dashes) need a recent Mermaid version. If your viewer is older, the diagram still renders, just without motion.
 

@@ -1,4 +1,4 @@
-# YALDA — AI Agent Status HUD
+# SORENA — AI Agent Status HUD
 
 A responsive, single-page React/Vite HUD driven by a six-state agent state machine.
 
@@ -16,8 +16,8 @@ The dev server runs on http://localhost:5173.
 ### JavaScript API
 
 ```js
-window.yalda.setState("working");
-window.yalda.getState();
+window.sorena.setState("working");
+window.sorena.getState();
 ```
 
 Valid states: `idle`, `working`, `success`, `speaking`, `listening`, and `error`.
@@ -31,7 +31,7 @@ Open `/#state=listening` or change the hash while the page is open.
 Both formats are accepted:
 
 ```js
-window.postMessage({ type: "yalda:setState", state: "speaking" }, "*");
+window.postMessage({ type: "sorena:setState", state: "speaking" }, "*");
 window.postMessage("error", "*");
 ```
 
@@ -40,7 +40,7 @@ window.postMessage("error", "*");
 Connect directly:
 
 ```js
-window.yalda.connectSocket("wss://example.com/agent-status");
+window.sorena.connectSocket("wss://example.com/agent-status");
 ```
 
 Or provide the URL at load time: `/?ws=wss%3A%2F%2Fexample.com%2Fagent-status`.

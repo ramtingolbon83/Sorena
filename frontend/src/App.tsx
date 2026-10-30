@@ -97,7 +97,7 @@ const STATE_KEYS = Object.keys(STATES) as AgentState[]
 
 declare global {
   interface Window {
-    yalda: {
+    sorena: {
       setState: (state: AgentState) => void
       getState: () => AgentState
       connectSocket: (url: string) => WebSocket
@@ -414,7 +414,7 @@ export default function App() {
       })
       return socket
     }
-    window.yalda = {
+    window.sorena = {
       setState: changeState,
       getState: () => stateRef.current,
       connectSocket,
@@ -438,7 +438,7 @@ export default function App() {
   } as React.CSSProperties
 
   return (
-    <main className={`yalda state-${agentState}`} style={cssVars}>
+    <main className={`sorena state-${agentState}`} style={cssVars}>
       <div className="noise" />
       <div className="frame">
         <i />
@@ -451,7 +451,7 @@ export default function App() {
         <header className="brand panel-enter">
           <span className="brand-mark" />
           <div>
-            <p>YALDA AI AGENT</p>
+            <p>SORENA AI AGENT</p>
             <span>
               STATUS: <b aria-live="polite">{config.status}</b>
             </span>
@@ -474,7 +474,7 @@ export default function App() {
 
         <section
           className="center-column"
-          aria-label={`Yalda visual core: ${config.status}`}
+          aria-label={`Sorena visual core: ${config.status}`}
         >
           <EyeCore state={agentState} />
         </section>
@@ -486,7 +486,7 @@ export default function App() {
               <strong>FULL SPECTRUM</strong>
             </div>
             <WorldMap />
-            <div className="yalda-logo" aria-label="Yalda monogram">
+            <div className="sorena-logo" aria-label="Sorena monogram">
               <span>Y</span>
             </div>
           </div>

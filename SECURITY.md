@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-Yalda is currently under active development. Security updates are provided for the latest version available on the `main` branch.
+Sorena is currently under active development. Security updates are provided for the latest version available on the `main` branch.
 
 | Version | Supported          |
 | ------- | ------------------ |
@@ -11,7 +11,7 @@ Yalda is currently under active development. Security updates are provided for t
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability in Yalda, please report it responsibly.
+If you discover a security vulnerability in Sorena, please report it responsibly.
 
 Please **do not open a public GitHub issue** for security vulnerabilities.
 
@@ -29,8 +29,8 @@ Please allow us reasonable time to investigate and address a reported vulnerabil
 
 ## Security Considerations
 
-Yalda is an AI agent project and may interact with external tools, local systems, APIs, and user-provided input.
+Sorena is an AI agent project and may interact with external tools, local systems, APIs, and user-provided input.
 
-Users should run Yalda only in environments they trust and should carefully review the permissions and capabilities granted to its tools.
+Users should run Sorena only in environments they trust and should carefully review the permissions and capabilities granted to its tools.
 
 Security practices and this policy may evolve as the project develops.

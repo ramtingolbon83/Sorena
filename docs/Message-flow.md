@@ -1,6 +1,6 @@
-# Yalda Message Flow
+# Sorena Message Flow
 
-How one user message travels through Yalda, and how the HUD state changes along the way.
+How one user message travels through Sorena, and how the HUD state changes along the way.
 
 ## Web chat sequence
 

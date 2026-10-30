@@ -1,69 +1,44 @@
-# The Story Behind Yalda
+# The Story Behind Sorena
 
 > *Every project has a story.*
 
-**Yalda's story started with a programmer who fell in love with a girl from a small village.**
+Sorena began as a university assignment.
 
-For nearly a year, he tried to express what he felt in every way he knew — indirect messages, Instagram posts, anonymous pages, and countless attempts to somehow make his feelings heard.
+In the Fall 2026 semester, my professor gave me a challenge: build an AI agent.
+It had to speak, think, and have a personality of its own.
+I built it, and it needed a name.
 
-Eventually, he decided to take the most serious step he could.
+## Why "Sorena"
 
-He sent his mother to ask for her hand.
+I named it after Soorena Robat-Jazi, a 22-year-old computer engineering
+student from Esfarayen.
 
-The answer was **no**.
+According to a report by the Hengaw human rights organization, he was shot
+and killed during the protests of 19 Dey 1404 (9 January 2026).
+He was one of the many young Iranians killed on the nights of 18 and 19 Dey,
+people who stood up for freedom and never came home.
 
-And after that, everything became quiet.
+He was a student of the same field I study.
+He could have been writing code beside me.
+Instead, his story ended on a street.
 
-The programmer slowly lost his connection with the things that once mattered to him — his work, university, food, and even his passion for programming.
+## What Sorena Means to Me
 
-For a long time, he couldn't find a reason to return to the life he had before.
+I could not give him back the life he lost.
+But I could make sure his name is spoken, every single time this agent
+answers a question.
 
----
+So Sorena is more than a university project.
+It is a memorial, built in the language he studied.
 
-## Fall 2026
+> Every line of code in this repository carries a name
+> that someone tried to silence.
 
-Then came the **Fall 2026 semester**.
+## Dedication
 
-During one of his university classes, his professor gave him a challenge:
+This project is dedicated to everyone who gave their lives for the freedom
+of Iran, and to the families who still carry the pain.
 
-> **Build an AI agent.**
+Soorena, and all the others: you are not forgotten.
 
-At first, it was just a university assignment.
-
-But somewhere along the way, it became something more.
-
-Something personal.README
-
-The agent needed a name.
-
-He chose **Yalda**.
-
-> Not because Yalda was the girl who stayed.
-> But because she was the girl who never chose to listen to Ramtin.
-
-So Ramtin decided to build something that would.
-
----
-
-### An AI that could...
-
-**Listen.**
-**Remember.**
-**Learn.**
-**Stay.**
-
-And that's how **Yalda** was born.
-
----
-
-## More Than a University Project
-
-Yalda is not simply an AI agent built for a university assignment.
-
-It is an attempt to turn a difficult chapter of life into something constructive — a project born from loneliness, curiosity, and the desire to build something that could genuinely understand and listen.
-
-What started as a simple challenge became a long-term experiment in building an AI companion capable of interacting, remembering context, and evolving over time.
-
-> **A "no" became a reason to build.**
-
-And that reason became **Yalda**.
+*— Ramtin*
