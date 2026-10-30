@@ -2,7 +2,7 @@ import shutil
 import subprocess
 from pathlib import Path
 
-FAVORITE_SONG = Path("/home/ramtin/Music/Hayedeh - Arousak  - 320.mp3").expanduser()
+FAVORITE_SONG = Path("/home/ramtin/Music/_Unknown Artist - Asemoon Maste Jononi - 320.mp3").expanduser()
 
 _player: subprocess.Popen | None = None
 

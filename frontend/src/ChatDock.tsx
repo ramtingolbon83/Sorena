@@ -15,7 +15,7 @@ type Line =
   | { kind: "user" | "agent" | "error" | "note"; text: string }
   | { kind: "tool"; call: ToolCall }
 
-const SPEAK_KEY = "yalda.speak"
+const SPEAK_KEY = "sorena.speak"
 
 const readSpeakPreference = () => {
   try {
@@ -154,7 +154,7 @@ export default function ChatDock({ onState }: { onState: (state: string) => void
   return (
     <div className={`chat-dock ${open ? "open" : ""}`}>
       {open && (
-        <section className="chat-panel" aria-label="Chat with Yalda">
+        <section className="chat-panel" aria-label="Chat with Sorena">
           <header>
             <span>
               <i className={`link link-${link}`} /> LINK // {link.toUpperCase()}
@@ -189,7 +189,7 @@ export default function ChatDock({ onState }: { onState: (state: string) => void
           </ul>
 
           <div className="chat-log" ref={logRef} aria-live="polite">
-            {lines.length === 0 && <p className="muted">Ask Yalda something…</p>}
+            {lines.length === 0 && <p className="muted">Ask Sorena something…</p>}
             {lines.map((line, index) =>
               line.kind === "tool" ? (
                 <p key={index} className="line tool">
@@ -217,7 +217,7 @@ export default function ChatDock({ onState }: { onState: (state: string) => void
             <input
               value={input}
               onChange={(event) => setInput(event.target.value)}
-              placeholder={link === "online" ? "Message Yalda" : "Backend offline"}
+              placeholder={link === "online" ? "Message Sorena" : "Backend offline"}
               dir="auto"
               autoFocus
             />
@@ -232,7 +232,7 @@ export default function ChatDock({ onState }: { onState: (state: string) => void
         onClick={() => setOpen((value) => !value)}
         aria-expanded={open}
       >
-        <i className={`link link-${link}`} /> {open ? "CLOSE" : "ASK YALDA"}
+        <i className={`link link-${link}`} /> {open ? "CLOSE" : "ASK SORENA"}
       </button>
     </div>
   )

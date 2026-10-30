@@ -1,4 +1,4 @@
-"""YALDA backend service.
+"""SORENA backend service.
 
   GET  /api/tools   -> the agent's tools (from schemas.py), flagged if missing in tool_registry
   POST /api/chat    -> run the agent for one user message (history kept per session_id)
@@ -78,7 +78,7 @@ def wav_seconds(wav: bytes) -> float:
         return clip.getnframes() / clip.getframerate()
 
 
-app = FastAPI(title="YALDA agent service")
+app = FastAPI(title="SORENA agent service")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],

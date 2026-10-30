@@ -11,7 +11,7 @@ export default defineConfig({
   },
   server: {
     port: 5173,
-    // YALDA backend service (service/server.py: uvicorn server:app --port 8001)
+    // SORENA backend service (service/server.py: uvicorn server:app --port 8001)
     proxy: {
       '/api': 'http://127.0.0.1:8001',
       '/ws': { target: 'ws://127.0.0.1:8001', ws: true },

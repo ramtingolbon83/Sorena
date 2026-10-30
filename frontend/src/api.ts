@@ -1,4 +1,4 @@
-// Thin client for the YALDA backend service (see agent/server.py).
+// Thin client for the SORENA backend service (see agent/server.py).
 // In dev, Vite proxies /api and /ws to the backend (vite.config.ts).
 // For another host set VITE_API_URL / VITE_WS_URL in frontend/.env.local.
 
