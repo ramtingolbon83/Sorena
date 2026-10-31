@@ -1,4 +1,11 @@
 # The Story Behind Sorena
+<p align="center">
+  <img
+    src="frontend/public/Sorena.png"
+    alt="In memory of Soorena Robat-Jazi"
+    width="350"
+  />
+</p>
 
 > *Every project has a story.*
 
